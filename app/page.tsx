@@ -1,6 +1,26 @@
-import Image from "next/image";
+'use client';
+
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 export default function Home() {
+  const [postgresVersion, setPostgresVersion] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchPostgresVersion() {
+      try {
+        const response = await fetch('/api/pg-version');
+        const data = await response.json();
+        setPostgresVersion(data.version);
+      } catch (error) {
+        console.error('Error fetching Postgres version:', error);
+        setPostgresVersion('Failed to load Postgres version');
+      }
+    }
+
+    fetchPostgresVersion();
+  }, []);
+
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
@@ -48,6 +68,14 @@ export default function Home() {
             Read our docs
           </a>
         </div>
+
+        {/* Display the Postgres Version */}
+        {postgresVersion && (
+          <div className="mt-4 text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
+            <strong>Postgres Version: </strong>
+            {postgresVersion}
+          </div>
+        )}
       </main>
       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
         <a
